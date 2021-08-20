@@ -15,6 +15,7 @@ def recommend(user_id):
                 productName = '無產品名'
             try:
                 productPrice = mata[i][0][2]
+                productPrice ="NT$ "+str(round(float(productPrice) * 30 , 2))
             except:
                 productPrice = '無相關價格'
             try:
@@ -56,7 +57,7 @@ def recommend(user_id):
                         "contents": [
                             {
                             "type": "text",
-                            "text": "NT"+str(round(float(productClass) * 30 , 2))
+                            "text": str(productClass)
                             }
                         ]
                         },
@@ -108,6 +109,7 @@ def recommendP(message):
             productName = '無產品名'
         try:
             productPrice = mata[i][0][2]
+            productPrice ="NT$ "+str(round(float(productPrice) * 30 , 2))
         except:
             productPrice = '無相關價格'
         try:
@@ -177,7 +179,7 @@ def recommendP(message):
                         },
                         {
                         "type": "text",
-                        "text": "NT"+str(round(float(productClass) * 30 , 2))
+                        "text": str(productPrice)
                         }
                     ]
                     }
