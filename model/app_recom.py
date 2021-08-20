@@ -56,7 +56,7 @@ def recommend(user_id):
                         "contents": [
                             {
                             "type": "text",
-                            "text": str(productClass)
+                            "text": "NT"+str(round(float(productClass) * 30 , 2))
                             }
                         ]
                         },
@@ -177,7 +177,7 @@ def recommendP(message):
                         },
                         {
                         "type": "text",
-                        "text": str(productPrice)
+                        "text": "NT"+str(round(float(productClass) * 30 , 2))
                         }
                     ]
                     }
