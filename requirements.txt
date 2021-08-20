@@ -1,0 +1,5 @@
+flask
+pymysql
+datetime
+line-bot-sdk
+confluent_kafka
