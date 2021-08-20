@@ -44,7 +44,7 @@ def member_html():
         data = {'time': str(now),'ip':ip ,'user_id':str(userid),'name': name, 'age': age, 'MARITAL': MARITAL, 'INCOME': INCOME, 'HH_COMP': HH_COMP,
                 'photo_url':  photo_url }
         print(data)
-        # kafka_py.kafka_member('add_member', data)
+        kafka_py.kafka_member('add_member', data)
         return redirect(url_for('welcome'))
     return render_template('/member.html')
 

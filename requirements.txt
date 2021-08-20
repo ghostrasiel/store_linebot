@@ -1,5 +1,6 @@
-flask
+Flask
 pymysql
 datetime
 line-bot-sdk
 confluent_kafka
+werkzeug
