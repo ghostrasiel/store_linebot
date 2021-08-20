@@ -36,7 +36,7 @@ def member_html():
         HH_COMP = request.form.get('HH_COMP')
         f = request.files['file']
         fname = re.search('(jpg|png|jpeg|JPG|PNG|JPEG)' , secure_filename(f.filename)).group()
-        upload_path = os.path.join('.', 'assets/face_photo',f'{userid}.{fname}')
+        upload_path = os.path.join(file, 'assets\\face_photo',f'{userid}.{fname}')
         f.save(upload_path)
 
         photo_url = 'https://'+url_host + '/assets/face_photo/' + f'{userid}.{fname}'
