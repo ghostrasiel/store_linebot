@@ -1,5 +1,4 @@
-# from model.ALS_to_Mysql import *
-from ALS_to_Mysql import *
+from model.ALS_to_Mysql import *
 
 
 detail = ''
