@@ -1,4 +1,5 @@
-from model.ALS_to_Mysql import *
+# from model.ALS_to_Mysql import *
+from ALS_to_Mysql import *
 
 
 detail = ''
@@ -15,7 +16,6 @@ def recommend(user_id):
                 productName = '無產品名'
             try:
                 productPrice = mata[i][0][2]
-                productPrice ="NT$ "+str(round(float(productPrice) * 30 , 0))
             except:
                 productPrice = '無相關價格'
             try:
@@ -100,7 +100,7 @@ def recommend(user_id):
 def recommendP(message):
     message = message
     recommendation_item = show_recommendation_item(message) # mesage = 'apple'
-    mata = recommendation_detail(recommendation_item)
+    mata = recommendation_detail(recommendation_item , mode='item')
     data = {"type": "carousel",'contents':[]}
     for i in mata:
         try:
@@ -109,7 +109,6 @@ def recommendP(message):
             productName = '無產品名'
         try:
             productPrice = mata[i][0][2]
-            productPrice ="NT$ "+str(round(float(productPrice) * 30 , 0))
         except:
             productPrice = '無相關價格'
         try:
@@ -187,3 +186,6 @@ def recommendP(message):
                 }
             })
     return data
+
+if __name__ == '__main__':
+    print(recommendP('apple'))

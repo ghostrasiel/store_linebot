@@ -5,3 +5,4 @@ line-bot-sdk
 confluent_kafka
 werkzeug
 gunicorn
+pandas

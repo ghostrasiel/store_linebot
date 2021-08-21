@@ -1,12 +1,15 @@
 import pymysql
 import csv
 import sys
+import pandas as pd
 
 host = '3.113.29.214'  # '3.113.29.214'
 user = 'eric'  # 'eric'
 passwd = '123456'  # '123456'
 port = 3306
-conninfo = {'host' : host ,'port' : port,'user' : user , 'passwd' : passwd, 'db' : 'recommendation_system','charset' : 'utf8mb4'}
+conninfo = {'host': host, 'port': port, 'user': user, 'passwd': passwd, 'db': 'recommendation_system',
+            'charset': 'utf8mb4'}
+
 
 def add_csv(path):
     try:
@@ -14,8 +17,8 @@ def add_csv(path):
         cursor = conn.cursor()
         csv_data = csv.reader(open(path))
         for row in csv_data:
-            cursor.execute('INSERT INTO als(household_key, recommendations)'\
-                           'VALUES("%s", "%s")',row)
+            cursor.execute('INSERT INTO als(household_key, recommendations)' \
+                           'VALUES("%s", "%s")', row)
         # close the connection to the database.
         conn.commit()
         print("Done")
@@ -27,6 +30,8 @@ def add_csv(path):
         cursor.close()
         conn.close()
         print("db close")
+
+
 def show_recommendation(customer_id):
     try:
         conn = pymysql.connect(**conninfo)
@@ -41,7 +46,7 @@ def show_recommendation(customer_id):
             return rec_list
         except:
             # 這邊丟內容協同過濾
-            #err = "no history records"
+            # err = "no history records"
             return False
     except:
         print('異常')
@@ -51,6 +56,7 @@ def show_recommendation(customer_id):
         cursor.close()
         conn.close()
         print("db close")
+
 
 def show_recommendation_item(commodity_desc):
     try:
@@ -79,25 +85,31 @@ def show_recommendation_item(commodity_desc):
         print("db close")
 
 
-def recommendation_detail(item_list):
-    rec_list = []
-    for i in item_list:
-        rec_list.append(i)
+def recommendation_detail(item_list , mode=None):
+    group_lsit = []
     try:
-        conn = pymysql.connect(host='3.113.29.214', user='eric', password='123456', port=3306, \
-                             database="store_db", charset='utf8mb4')
+        conn = pymysql.connect(host='3.113.29.214', user='eric', password='123456', port=3306, database="store_db", charset='utf8mb4')
         cursor = conn.cursor()
         item_dict = {}
-        for i in rec_list:
+        for i in item_list:
             i = i.strip()
-            try:
-                item = f"""select * from product where commodity = '{i}' ORDER BY RAND() LIMIT 1"""
-                cursor.execute(item)
-                recommendation_item = cursor.fetchall()
-                item_dict[i] = recommendation_item
-            except:
-                 item_dict[i] = 'no item record'
-        return item_dict
+            group_lsit.append(f"commodity = '{i}'")
+
+        try:
+            if mode != 'item':
+                item = "select * from product where {} or {} or {} or {} or {} ".format(*group_lsit)
+            elif mode == 'item':
+                item = "select * from product where {} or {} or {} or {}  ".format(*group_lsit)
+            cursor.execute(item)
+            recommendation_item = cursor.fetchall()
+            df = pd.DataFrame(recommendation_item)
+            titl = [i for i in df[3].value_counts().index]  # 抬頭
+            for t in titl:
+                item_dict[t] = df[df[3] == t].sample(n=1).values.tolist()
+        except:
+            item_dict = None
+            pass
+
     except:
         print('異常')
         print(sys.exc_info()[0])
@@ -106,6 +118,9 @@ def recommendation_detail(item_list):
         cursor.close()
         conn.close()
         print("db close")
+
+    return item_dict
+
 
 def find_householdkey(customer_id):
     try:
@@ -128,26 +143,15 @@ def find_householdkey(customer_id):
         print("db close")
 
 
-
 if __name__ == '__main__':
-    add_csv(path)
-    show_recommendation(customer_id)
-    show_recommendation_item(commodity_desc)
-    recommendation_detail(item_list)
-    find_householdkey(customer_id)
+    user_id = 1000
+    # show_recommendation(user_id)
+    # recommendation_user = show_recommendation(user_id)
+    # print(recommendation_user)
+    item_list = show_recommendation_item('apple')
+    mata = recommendation_detail(item_list , mode='item')
+    # find_householdkey(customer_id)
+    # mata = recommendation_detail(recommendation_user)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    print(item_list)
+    print(mata)
