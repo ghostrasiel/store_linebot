@@ -70,11 +70,10 @@ def show_recommendation_item(commodity_desc):
             rec_list = []
             for i in recommendation_item[0][0].split(','):
                 rec_list.append(i)
-            return rec_list
+
         except:
             # 這邊丟內容協同過濾
-            err = "no history records"
-            return err
+            rec_list = "no history records"
     except:
         print('異常')
         print(sys.exc_info()[0])
@@ -83,6 +82,8 @@ def show_recommendation_item(commodity_desc):
         cursor.close()
         conn.close()
         print("db close")
+
+    return rec_list
 
 
 def recommendation_detail(item_list , mode=None):
