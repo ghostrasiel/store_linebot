@@ -86,7 +86,7 @@ def handle_message(event):
     elif message_type== 'text':
         name = profile.display_name #狀態消息
         mesage = str.lower(event.message.text)
-        mesage = masage.lstrip()
+        mesage = mesage.lstrip()
         mesage = mesage.rstrip()
 
         if (mesage == '上筆消費明細') : #查詢消費紀錄
