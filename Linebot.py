@@ -85,9 +85,7 @@ def handle_message(event):
 
     elif message_type== 'text':
         name = profile.display_name #狀態消息
-        mesage = str.lower(event.message.text)
-        mesage = mesage.lstrip()
-        mesage = mesage.rstrip()
+        mesage = event.message.text
 
         if (mesage == '上筆消費明細') : #查詢消費紀錄
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text = select.select_barsket(member_id)))
@@ -102,7 +100,7 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
             else:
                 line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
-        elif mesage == "apple":
+        elif re.search('apple' , str.lower(mesage) ) != None :
             FlexMessage = app_recom.recommendP(mesage)
             if FlexMessage is None:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查無相關商品'))
