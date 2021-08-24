@@ -85,7 +85,9 @@ def handle_message(event):
 
     elif message_type== 'text':
         name = profile.display_name #狀態消息
-        mesage = event.message.text
+        mesage = str.lower(event.message.text)
+        mesage = masage.lstrip()
+        mesage = mesage.rstrip()
 
         if (mesage == '上筆消費明細') : #查詢消費紀錄
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text = select.select_barsket(member_id)))
