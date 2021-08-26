@@ -16,7 +16,7 @@ def select_barsket(member_id):
             cursor = conn.cursor()
             select_product = f"""select b.member_id , p.name , b.quantity , round(p.price * b.quantity , 2) as 'Total'  , b.date
                 from barsket as b natural join product as p where member_id ="{member_id}" and transaction_id is not null 
-                and date = (select date   FROM store_db.barsket where member_id LIKE "U%" and transaction_id  is not null group by date  order by date desc limit 1) ;  """
+                and date >= (select date_format(date , '%Y-%m-%d') as date FROM store_db.barsket where member_id LIKE "{member_id}" and transaction_id  is not null group by date  order by date desc limit 1) ;  """
 
             cursor.execute(select_product)
             barsket_product = cursor.fetchall()
@@ -166,5 +166,5 @@ def updata_tag(member_id , mesage) :
 if __name__ == '__main__':
     # today = datetime.datetime.today()
     # print(today.strftime('%Y-%m-%d'))
-    print(select_barsket('1234'  ))
+    print(select_barsket('U6ff9124eb8c4224f8fc607bd5e87ea29' ))
     # print(add_member('1234.com/' ,  member_id='U7216736aff9e39ca18b1534e6efe97bc'))
