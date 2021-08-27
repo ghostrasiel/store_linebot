@@ -43,8 +43,8 @@ def lineNotifyMessage(tag , msg):
     r = requests.post("https://notify-api.line.me/api/notify", headers = headers, params = payload)
     return r.status_code
 
-def err_line_push(tag , msg=f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}'):
-    add_logs(tag=tag , log=msg)
+def err_line_push(tag , msg=f'{sys.exc_info()[0]}{sys.exc_info()[1]}'):
+    add_logs(tag=tag , log=msg.replace("'" , ''))
     lineNotifyMessage(tag=tag, msg=msg)
 
 if __name__ == "__main__":
