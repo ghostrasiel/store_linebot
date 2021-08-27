@@ -1,4 +1,4 @@
-from model import select , kafka_py , app_recom
+from model import select , kafka_py , app_recom , Alarm_system
 from flask import Flask, request, abort , render_template , redirect , url_for
 from werkzeug.utils import secure_filename
 from linebot import LineBotApi, WebhookHandler 
@@ -7,6 +7,7 @@ from linebot.exceptions import InvalidSignatureError
 import os 
 import re
 import datetime
+import sys
 
 file = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__ , static_url_path='/assets',static_folder=f'{file}/assets')
@@ -24,34 +25,40 @@ def index():
 
 @app.route('/member' , methods = ['GET' , 'POST'])
 def member_html():
-    url_host = request.host
-    method = request.method
-    userid = request.args.get('liff.state')[6:]
-    ip = request.remote_addr
-    if method == 'POST':
-        name =request.form.get('name')
-        age =request.form.get('age')
-        MARITAL = request.form.get('MARITAL')
-        INCOME = request.form.get('INCOME')
-        HH_COMP = request.form.get('HH_COMP')
-        f = request.files['file']
-        fname = re.search('(jpg|png|jpeg|JPG|PNG|JPEG)' , secure_filename(f.filename)).group()
-        upload_path = os.path.join(file, 'assets/face_photo',f'{userid}.{fname}')
-        f.save(upload_path)
+    try:
+        url_host = request.host
+        method = request.method
+        userid = request.args.get('liff.state')[6:]
+        ip = request.remote_addr
+        if method == 'POST':
+            name =request.form.get('name')
+            age =request.form.get('age')
+            MARITAL = request.form.get('MARITAL')
+            INCOME = request.form.get('INCOME')
+            HH_COMP = request.form.get('HH_COMP')
+            f = request.files['file']
+            fname = re.search('(jpg|png|jpeg|JPG|PNG|JPEG)' , secure_filename(f.filename)).group()
+            upload_path = os.path.join(file, 'assets/face_photo',f'{userid}.{fname}')
+            f.save(upload_path)
 
-        photo_url = 'https://'+url_host + '/assets/face_photo/' + f'{userid}.{fname}'
-        now = datetime.datetime.today()
-        data = {'time': str(now),'ip':ip ,'user_id':str(userid),'name': name, 'age': age, 'MARITAL': MARITAL, 'INCOME': INCOME, 'HH_COMP': HH_COMP,
-                'photo_url':  photo_url }
-        print(data)
-        kafka_py.kafka_member('add_member', data)
-        return redirect(url_for('welcome'))
-    return render_template('/member.html')
+            photo_url = 'https://'+url_host + '/assets/face_photo/' + f'{userid}.{fname}'
+            now = datetime.datetime.today()
+            data = {'time': str(now),'ip':ip ,'user_id':str(userid),'name': name, 'age': age, 'MARITAL': MARITAL, 'INCOME': INCOME, 'HH_COMP': HH_COMP,
+                    'photo_url':  photo_url }
+            print(data)
+            kafka_py.kafka_member('add_member', data)
+            return redirect(url_for('welcome'))
+        return render_template('/member.html')
+    except:
+        Alarm_system.err_line_push('Linebot註冊',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
 
 
 @app.route('/welcome' )
 def welcome():
-    return render_template('/welcome.html')
+    try:
+        return render_template('/welcome.html')
+    except:
+        Alarm_system.err_line_push('Linebot註冊成功',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
 
 
 
@@ -70,44 +77,48 @@ def callback():
     except InvalidSignatureError:
         print("Invalid signature. Please check your channel access token/channel secret.")
         abort(400)
+        Alarm_system.err_line_push('Linebot註冊成功',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
 
     return 'OK'
 
 @handler.add(MessageEvent)
 def handle_message(event):
-    message_type = event.message.type
-    user_id = event.source.user_id
-    profile = line_bot_api.get_profile(user_id) #取得個人資料
-    member_id = profile.user_id
-    print(member_id)
-    if message_type =='image': #等待qrcode偵測
-        pass
-
-    elif message_type== 'text':
-        name = profile.display_name #狀態消息
-        mesage = event.message.text
-
-        if (mesage == '上筆消費明細') : #查詢消費紀錄
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text = select.select_barsket(member_id)))
-        elif mesage == '加入會員': #加入會員
-            # url_host = 'https://'+request.host
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=select.add_member(html='https://liff.line.me/1656184304-ZK3r5QbL', member_id=member_id)))
-
-
-        elif mesage == "專屬推薦":
-            FlexMessage = app_recom.recommend(user_id)
-            if FlexMessage is None:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
-            else:
-                line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
-        elif re.search('apple' , str.lower(mesage) ) != None :
-            FlexMessage = app_recom.recommendP(mesage)
-            if FlexMessage is None:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查無相關商品'))
-            else:
-                line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
-        else:
+    try:
+        message_type = event.message.type
+        user_id = event.source.user_id
+        profile = line_bot_api.get_profile(user_id) #取得個人資料
+        member_id = profile.user_id
+        print(member_id)
+        if message_type =='image': #等待qrcode偵測
             pass
+
+        elif message_type== 'text':
+            name = profile.display_name #狀態消息
+            mesage = event.message.text
+
+            if (mesage == '上筆消費明細') : #查詢消費紀錄
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text = select.select_barsket(member_id)))
+            elif mesage == '加入會員': #加入會員
+                # url_host = 'https://'+request.host
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=select.add_member(html='https://liff.line.me/1656184304-ZK3r5QbL', member_id=member_id)))
+
+
+            elif mesage == "專屬推薦":
+                FlexMessage = app_recom.recommend(user_id)
+                if FlexMessage is None:
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
+                else:
+                    line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
+            elif re.search('apple' , str.lower(mesage) ) != None :
+                FlexMessage = app_recom.recommendP(mesage)
+                if FlexMessage is None:
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查無相關商品'))
+                else:
+                    line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
+            else:
+                pass
+    except:
+        Alarm_system.err_line_push('Linebot註冊成功',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
 
 
 
