@@ -25,40 +25,34 @@ def index():
 
 @app.route('/member' , methods = ['GET' , 'POST'])
 def member_html():
-    try:
-        url_host = request.host
-        method = request.method
-        userid = request.args.get('liff.state')[6:]
-        ip = request.remote_addr
-        if method == 'POST':
-            name =request.form.get('name')
-            age =request.form.get('age')
-            MARITAL = request.form.get('MARITAL')
-            INCOME = request.form.get('INCOME')
-            HH_COMP = request.form.get('HH_COMP')
-            f = request.files['file']
-            fname = re.search('(jpg|png|jpeg|JPG|PNG|JPEG)' , secure_filename(f.filename)).group()
-            upload_path = os.path.join(file, 'assets/face_photo',f'{userid}.{fname}')
-            f.save(upload_path)
+    url_host = request.host
+    method = request.method
+    userid = request.args.get('liff.state')[6:]
+    ip = request.remote_addr
+    if method == 'POST':
+        name =request.form.get('name')
+        age =request.form.get('age')
+        MARITAL = request.form.get('MARITAL')
+        INCOME = request.form.get('INCOME')
+        HH_COMP = request.form.get('HH_COMP')
+        f = request.files['file']
+        fname = re.search('(jpg|png|jpeg|JPG|PNG|JPEG)' , secure_filename(f.filename)).group()
+        upload_path = os.path.join(file, 'assets/face_photo',f'{userid}.{fname}')
+        f.save(upload_path)
 
-            photo_url = 'https://'+url_host + '/assets/face_photo/' + f'{userid}.{fname}'
-            now = datetime.datetime.today()
-            data = {'time': str(now),'ip':ip ,'user_id':str(userid),'name': name, 'age': age, 'MARITAL': MARITAL, 'INCOME': INCOME, 'HH_COMP': HH_COMP,
-                    'photo_url':  photo_url }
-            print(data)
-            kafka_py.kafka_member('add_member', data)
-            return redirect(url_for('welcome'))
-        return render_template('/member.html')
-    except:
-        Alarm_system.err_line_push('Linebot註冊',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
+        photo_url = 'https://'+url_host + '/assets/face_photo/' + f'{userid}.{fname}'
+        now = datetime.datetime.today()
+        data = {'time': str(now),'ip':ip ,'user_id':str(userid),'name': name, 'age': age, 'MARITAL': MARITAL, 'INCOME': INCOME, 'HH_COMP': HH_COMP,
+                'photo_url':  photo_url }
+        print(data)
+        kafka_py.kafka_member('add_member', data)
+        return redirect(url_for('welcome'))
+    return render_template('/member.html')
 
 
 @app.route('/welcome' )
 def welcome():
-    try:
-        return render_template('/welcome.html')
-    except:
-        Alarm_system.err_line_push('Linebot註冊成功',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
+    return render_template('/welcome.html')
 
 
 
