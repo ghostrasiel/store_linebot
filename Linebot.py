@@ -112,7 +112,7 @@ def handle_message(event):
             else:
                 pass
     except:
-        Alarm_system.err_line_push('Linebot註冊成功',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
+        Alarm_system.err_line_push('Linebot機器人',msg =f'{sys.exc_info()[0]}\n{sys.exc_info()[1]}')
         
 
 
