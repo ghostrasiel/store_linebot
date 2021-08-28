@@ -102,12 +102,16 @@ def handle_message(event):
                 recommend_member = select.select_recommend(user_id)
                 if recommend_member == None :
                     select.add_select_recommend(user_id)
-                    FlexMessage = app_recom.recommend(user_id)
-                    if FlexMessage is None:
-                        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
-                        select.del_select_recommend(user_id)
-                    else:
-                        line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
+                    try:
+                        FlexMessage = app_recom.recommend(user_id)
+                        if FlexMessage is None:
+                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入商品名稱'))
+                            select.del_select_recommend(user_id)
+                        else:
+                            line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
+                            select.del_select_recommend(user_id)
+                    except:
+                        line_bot_api.reply_message(event.reply_token, TextSendMessage(text = '請重新查詢'))
                         select.del_select_recommend(user_id)
                 else:
                     hold_text = random.choice(['請稍等一下', '耐心等候', '請等等正在推薦你', '好東西值得等待，請等待'])
@@ -116,12 +120,16 @@ def handle_message(event):
                 recommend_member = select.select_recommend(user_id)
                 if recommend_member == None :
                     select.add_select_recommend(user_id)
-                    FlexMessage = app_recom.recommendP(str.lower(mesage).strip())
-                    if FlexMessage is None:
-                        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查無相關商品'))
-                        select.del_select_recommend(user_id)
-                    else:
-                        line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
+                    try:
+                        FlexMessage = app_recom.recommendP(str.lower(mesage).strip())
+                        if FlexMessage is None:
+                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='查無相關商品'))
+                            select.del_select_recommend(user_id)
+                        else:
+                            line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text='專屬推薦你', contents=dict(FlexMessage)))
+                            select.del_select_recommend(user_id)
+                    except:
+                        line_bot_api.reply_message(event.reply_token, TextSendMessage(text = '請重新查詢'))
                         select.del_select_recommend(user_id)
                 else:
                     hold_text = random.choice(['請稍等一下', '耐心等候', '請等等正在推薦你', '好東西值得等待，請等待'])
