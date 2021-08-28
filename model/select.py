@@ -136,6 +136,62 @@ def updata_tag(member_id , mesage) :
     conn.close()
     return text
 
+def select_recommend(member_id) :
+    while True:
+        conn = pymysql.connect(**conninfo)
+        cursor = conn.cursor()
+        break
+    try:
+        select = f'''select member_id from select_recommend where member_id = '{member_id}' ;'''
+        cursor.execute(select)
+        text = cursor.fetchall()
+    except:
+        print('異常')
+        print(sys.exc_info()[0])
+        print(sys.exc_info()[1])
+    finally:
+        cursor.close()
+        conn.close()
+    if len(text) != 0:
+        return text
+    else:
+        return None
+
+def add_select_recommend(member_id) :
+    while True:
+        conn = pymysql.connect(**conninfo)
+        cursor = conn.cursor()
+        break
+    try:
+        add_recommend = f'''insert into select_recommend(member_id) values('{member_id}') ;'''
+        cursor.execute(add_recommend)
+        conn.commit()
+        print('ok')
+    except:
+        print('異常')
+        print(sys.exc_info()[0])
+        print(sys.exc_info()[1])
+    finally:
+        cursor.close()
+        conn.close()
+
+def del_select_recommend(member_id) :
+    while True:
+        conn = pymysql.connect(**conninfo)
+        cursor = conn.cursor()
+        break
+    try:
+        del_recommend = f'''delete from select_recommend where member_id = '{member_id}' ;'''
+        cursor.execute(del_recommend)
+        conn.commit()
+        print('ok')
+    except:
+        print('異常')
+        print(sys.exc_info()[0])
+        print(sys.exc_info()[1])
+    finally:
+        cursor.close()
+        conn.close()
 
 
     
@@ -166,5 +222,9 @@ def updata_tag(member_id , mesage) :
 if __name__ == '__main__':
     # today = datetime.datetime.today()
     # print(today.strftime('%Y-%m-%d'))
-    print(select_barsket('U6ff9124eb8c4224f8fc607bd5e87ea29' ))
+    add_select_recommend('U6ff9124eb8c4224f8fc607bd5e87ea29')
+    print(select_recommend('U6ff9124eb8c4224f8fc607bd5e87ea29'))
+    del_select_recommend('U6ff9124eb8c4224f8fc607bd5e87ea29')
+    print(select_recommend('U6ff9124eb8c4224f8fc607bd5e87ea29'))
+
     # print(add_member('1234.com/' ,  member_id='U7216736aff9e39ca18b1534e6efe97bc'))
