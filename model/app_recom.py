@@ -3,7 +3,7 @@ from model.ALS_to_Mysql import *
 
 detail = ''
 def recommend(user_id):
-    # user_id = 1000     # 修改位
+    user_id = 1000     # 修改位
     if show_recommendation(user_id):
         recommendation_user = show_recommendation(user_id)
         mata = recommendation_detail(recommendation_user)
